@@ -3,9 +3,7 @@ import { RequestGETListPokemons, RequestGETUniquePokemon } from "../../../http/i
 
 export class ModelApp {
     constructor() {
-        this.store = StoreApp.getStore();
         this.setBindMethods();
-        this.observableStore();
     }
 
     initStore() {
@@ -14,13 +12,7 @@ export class ModelApp {
             indexPokemonSelected: null
         })
     }
-
-    observableStore() {
-        StoreApp.subscribe(updatedStore => {
-            this.store = updatedStore;
-        });
-    }
-
+    
     setBindMethods() {
         this.getImagePokemon = this.getImagePokemon.bind(this);
         this.getUniquePokemon = this.getUniquePokemon.bind(this);
@@ -32,9 +24,9 @@ export class ModelApp {
     }
     
     getIndexNextImagePokemons(pokemons, indexPokemonSelected) {
-        const lastIndexPokemonts = pokemons.length - 1;
+        const lastIndex = pokemons.length - 1;
         let indexPokemonCurrent = indexPokemonSelected;
-        if (indexPokemonCurrent == null || indexPokemonCurrent === lastIndexPokemonts) {
+        if (indexPokemonCurrent == null || indexPokemonCurrent === lastIndex) {
             indexPokemonCurrent = 0;
         } else {
             indexPokemonCurrent += 1;

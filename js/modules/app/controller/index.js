@@ -2,6 +2,8 @@ import { ViewApp } from "../view/index.js";
 import { ModelApp } from "../model/index.js";
 import { StoreApp } from "../../app/index.js";
 
+/* TODO Code review done in the near day after sleeping and drinking coffee very black, a discount for me please :) Kkkkk */
+
 export class ControllerApp {
     constructor() {
         this.viewApp = new ViewApp();
@@ -9,7 +11,7 @@ export class ControllerApp {
         this.store = StoreApp.getStore();
         this.setBindMethods();
         this.observableStore();
-        this.elements = {
+        this.elementsInteractive = {
             popup: document.querySelector(".popup"),
             popupImage: document.querySelector(".content-popup-image"),
             buttonOpenPopup: document.querySelector(".btn-open-popup"),
@@ -33,14 +35,14 @@ export class ControllerApp {
 
     handleShowPopup(event) {
         const { pokemons, indexPokemonSelected = null } = this.store;
-        if (!indexPokemonSelected) {
+        if (indexPokemonSelected === null) {
             const indexCurrentPokemon = this.modelApp.getIndexNextImagePokemons(pokemons, indexPokemonSelected);
             const pokemon = pokemons[indexCurrentPokemon];
             this.modelApp.getImagePokemon(pokemon, urlImage => {
-                this.viewApp.setImagePopup(this.elements.popupImage, urlImage);
+                this.viewApp.setImagePopup(this.elementsInteractive.popupImage, urlImage);
             });
         }
-        this.viewApp.showPopup(event, this.elements.popup);
+        this.viewApp.showPopup(event, this.elementsInteractive.popup);
     }
 
     handleNextImagePopup(_event) {
@@ -48,18 +50,18 @@ export class ControllerApp {
         const indexCurrentPokemon = this.modelApp.getIndexNextImagePokemons(pokemons, indexPokemonSelected);
         const pokemon = pokemons[indexCurrentPokemon];
         this.modelApp.getImagePokemon(pokemon, urlImage => {
-            this.viewApp.setImagePopup(this.elements.popupImage, urlImage);
+            this.viewApp.setImagePopup(this.elementsInteractive.popupImage, urlImage);
         });
     }
 
     handleClosePopup(event) {
-        this.viewApp.closePopup(event, this.elements.popup);
+        this.viewApp.closePopup(event, this.elementsInteractive.popup);
     }
 
     setListeners() {
-        this.elements.buttonOpenPopup.addEventListener("click", this.handleShowPopup);
-        this.elements.buttonClosePopup.addEventListener("click", this.handleClosePopup);
-        this.elements.buttonUpdatePopup.addEventListener("click", this.handleNextImagePopup);
+        this.elementsInteractive.buttonOpenPopup.addEventListener("click", this.handleShowPopup);
+        this.elementsInteractive.buttonClosePopup.addEventListener("click", this.handleClosePopup);
+        this.elementsInteractive.buttonUpdatePopup.addEventListener("click", this.handleNextImagePopup);
     }
 
     init() {
