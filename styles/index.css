@@ -11,6 +11,7 @@
 
 button {
     outline: none !important;
+    user-select: none !important;
 }
 
 #root {

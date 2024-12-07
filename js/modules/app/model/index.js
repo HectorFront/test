@@ -3,26 +3,36 @@ import { RequestGETListPokemons, RequestGETUniquePokemon } from "../../../http/i
 
 export class ModelApp {
     constructor() {
+        this.store = StoreApp.getStore();
         this.setBindMethods();
+        this.observableStore();
     }
 
     initStore() {
-        StoreApp.setStore({ 
+        StoreApp.setStore({
             pokemons: [],
+            cacheImagePokemons: {},
             indexPokemonSelected: null
-        })
+        });
     }
-    
+
+    observableStore() {
+        StoreApp.subscribe(updatedStore => {
+            this.store = updatedStore;
+        });
+    }
+
     setBindMethods() {
         this.getImagePokemon = this.getImagePokemon.bind(this);
         this.getUniquePokemon = this.getUniquePokemon.bind(this);
         this.getIdPokemonURLBase = this.getIdPokemonURLBase.bind(this);
+        this.getImagePokemonCache = this.getImagePokemonCache.bind(this);
     }
 
     getIdPokemonURLBase(url) {
         return url.split("/pokemon/")[1].replaceAll("/", "");
     }
-    
+
     getIndexNextImagePokemons(pokemons, indexPokemonSelected) {
         const lastIndex = pokemons.length - 1;
         let indexPokemonCurrent = indexPokemonSelected;
@@ -35,13 +45,30 @@ export class ModelApp {
         return indexPokemonCurrent;
     }
 
+    getImagePokemonCache(idPokemon) {
+        const { cacheImagePokemons } = this.store;
+        if (cacheImagePokemons.hasOwnProperty(idPokemon)) {
+            return cacheImagePokemons[idPokemon];
+        }
+        return null;
+    }
+
     getImagePokemon(pokemon, callbackImage = () => {}) {
         if (pokemon) {
             const idPokemon = this.getIdPokemonURLBase(pokemon?.url);
-            this.getUniquePokemon(idPokemon)
-            .then(details => {
-                callbackImage(details?.sprites?.front_default)
-            }).catch(_err => {});
+            const URLImageCache = this.getImagePokemonCache(idPokemon);
+            if (URLImageCache) {
+                callbackImage(URLImageCache);
+            } else {
+                this.getUniquePokemon(idPokemon)
+                    .then(detailsPokemon => {
+                        const URLImage = detailsPokemon?.sprites?.front_default;
+                        StoreApp.setStore(({ cacheImagePokemons }) => {
+                            return { cacheImagePokemons: { ...cacheImagePokemons, [idPokemon]: URLImage } }
+                        })
+                        callbackImage(URLImage);
+                    }).catch(_err => {});
+            }
         } else {
             callbackImage(null);
         }

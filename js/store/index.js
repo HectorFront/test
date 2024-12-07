@@ -16,8 +16,13 @@ export class Store {
         this.listeners.forEach(callback => callback(this.store));
     }
 
-    setStore(data) {
-        this.store = { ...this.store, ...data };
+    setStore(callbackStore) {
+        if (typeof callbackStore === "function") {
+            this.store = { ...this.store, ...callbackStore(this.store) };
+        }
+        if (typeof callbackStore === "object") {
+            this.store = { ...this.store, ...callbackStore };
+        }
         this.notify();
     }
 }
